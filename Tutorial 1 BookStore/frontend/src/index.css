@@ -1,0 +1,12 @@
+/* ============================================================
+   index.css
+   ------------------------------------------------------------
+   PURPOSE: Global stylesheet entry point. These three directives
+   pull in Tailwind CSS's base reset styles, its component
+   classes, and its utility classes (the bg-*, text-*, flex,
+   etc. classes used all over the .jsx files).
+   ============================================================ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
