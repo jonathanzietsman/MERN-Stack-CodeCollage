@@ -195,11 +195,12 @@ sequenceDiagram
     IDX->>IDX: ReviewsDAO.injectDB(client)
     IDX->>APP: app.listen(5000)
     APP-->>L: server is running on port:5000
-````
+```
+
 
 ### 7.2 · Get Movies with Filters
 
-```
+```mermaid
 sequenceDiagram
     autonumber
     actor L as Learner
@@ -222,9 +223,10 @@ sequenceDiagram
     C-->>B: 200 JSON with movies, page, filters, entries_per_page, total_results
 ```
 
+
 ### 7.3 · Add a Review (with ownership)
 
-```
+```mermaid
 sequenceDiagram
     autonumber
     actor L as Learner
@@ -247,9 +249,10 @@ sequenceDiagram
     FE->>FE: setSubmitted(true)
 ```
 
+
 ### 7.4 · Deploy to Heroku
 
-```
+```mermaid
 sequenceDiagram
     autonumber
     actor L as Learner
@@ -273,11 +276,12 @@ sequenceDiagram
     HRK-->>L: deployed
 ```
 
+
 ---
 
 ## 8 · State Machine
 
-```
+```mermaid
 stateDiagram-v2
     [*] --> Setup
 
@@ -301,7 +305,9 @@ stateDiagram-v2
     DeployFrontend --> [*]: live on Heroku and Netlify
 ```
 
-| **StateDescriptionDeliverable** |                                                |                         |
+
+| **State** | **Description** | **Deliverable** |
+| --- | --- | --- |
 | ------------------------------- | ---------------------------------------------- | ----------------------- |
 | **Setup**                       | Folder structure + Atlas cluster + sample data | `movie-reviews/`        |
 | **BackendReady**                | Express listening on `5000`, DB connected      | `server.js`, `index.js` |
@@ -320,7 +326,8 @@ stateDiagram-v2
 
 ## 9 · Business Rules
 
-| **RuleSpecification** |                                                                                            |
+| **Rule** | **Specification** |
+| --- | --- |
 | --------------------- | ------------------------------------------------------------------------------------------ |
 | **BR-01**             | The API base path is `/api/v1/movies`.                                                     |
 | **BR-02**             | `moviesPerPage` defaults to **20**; `page` defaults to **0**.                              |
@@ -355,7 +362,7 @@ stateDiagram-v2
 
 ### Collections
 
-```
+```mermaid
 erDiagram
     MOVIES ||--o{ REVIEWS : receives
 
@@ -385,6 +392,7 @@ erDiagram
     }
 ```
 
+
 ### Movie Document (from `sample_mflix.movies`)
 
 ts
@@ -411,6 +419,7 @@ ts
 }
 ```
 
+
 ### Review Document (in `reviews` collection)
 
 ts
@@ -426,9 +435,11 @@ ts
 }
 ```
 
+
 ### API Endpoints
 
-| **MethodPathControllerPurpose** |                          |                   |                                                                     |
+| **Method** | **Path** | **Controller** | **Purpose** |
+| --- | --- | --- | --- |
 | ------------------------------- | ------------------------ | ----------------- | ------------------------------------------------------------------- |
 | GET                             | `/api/v1/movies`         | `apiGetMovies`    | List movies with optional `title`, `rated`, `page`, `moviesPerPage` |
 | GET                             | `/api/v1/movies/id/:id`  | `apiGetMovieById` | Single movie + its reviews (via `$lookup`)                          |
@@ -450,6 +461,7 @@ ts
   total_results: number
 }
 ```
+
 
 ---
 
@@ -478,6 +490,7 @@ text
 +------------------------------------------------------------------------------+
 ```
 
+
 ### Movie Page with Reviews (Ch. 18–19)
 
 text
@@ -498,6 +511,7 @@ text
 +----------------------+-------------------------------------------------------+
 ```
 
+
 **Key UI affordances**
 
 - **Navbar** switches between `Login` and `Logout User` based on `user` state.
@@ -512,7 +526,8 @@ text
 
 ## 12 · Security & Configuration
 
-| **ConcernCurrent StateRecommended Hardening** |                                             |                                                                   |
+| **Concern** | **Current State** | **Recommended Hardening** |
+| --- | --- | --- |
 | --------------------------------------------- | ------------------------------------------- | ----------------------------------------------------------------- |
 | **Auth**                                      | Fake login — any `{ name, id }` sets `user` | Real auth (Firebase Auth, OAuth, Auth0).                          |
 | **Secrets**                                   | `.env` holds `MOVIEREVIEWS_DB_URI`          | Keep `.env` out of git; add to `.gitignore`.                      |
@@ -535,7 +550,8 @@ text
 
 ## 13 · Observability & Feedback Surface
 
-| **EventTypeSurface**      |              |                                                                         |
+| **Event** | **Type** | **Surface** |
+| --- | --- | --- |
 | ------------------------- | ------------ | ----------------------------------------------------------------------- |
 | Server started            | Text         | `server is running on port:5000`                                        |
 | DB connection failed      | Text (error) | `console.error(e)` + process exits                                      |
@@ -553,37 +569,37 @@ text
 
 ## 14 · Test Scenarios
 
-<details> <summary>\<b>TC-01 · Backend boots and connects\</b></summary>
+<details> <summary><b>TC-01 · Backend boots and connects</b></summary>
 
 - **Given** a valid `.env` and Atlas IP whitelist
 - **When** `nodemon server` runs
 - **Then** the terminal prints `server is running on port:5000`
 
-</details><details> <summary>\<b>TC-02 · Root route returns "hello world"\</b></summary>
+</details><details> <summary><b>TC-02 · Root route returns "hello world"</b></summary>
 
 - **Given** the initial `movies.route.js`
 - **When** the browser hits `http://localhost:5000/api/v1/movies`
 - **Then** the page shows `hello world`
 
-</details><details> <summary>\<b>TC-03 · Wildcard returns 404 JSON\</b></summary>
+</details><details> <summary><b>TC-03 · Wildcard returns 404 JSON</b></summary>
 
 - **Given** any unknown route
 - **When** the browser hits `http://localhost:5000/anything`
 - **Then** the response is `{"error":"not found"}` with status `404`
 
-</details><details> <summary>\<b>TC-04 · Movies list returns 20 results\</b></summary>
+</details><details> <summary><b>TC-04 · Movies list returns 20 results</b></summary>
 
 - **Given** the DAO + Controller are wired
 - **When** Insomnia GETs `/api/v1/movies`
 - **Then** `entries_per_page` is `20`, `page` is `0`, and `movies` has 20 items
 
-</details><details> <summary>\<b>TC-05 · Filter by rating\</b></summary>
+</details><details> <summary><b>TC-05 · Filter by rating</b></summary>
 
 - **Given** movies exist
 - **When** `GET /api/v1/movies?rated=G`
 - **Then** every returned movie has `rated === "G"` and `total_results` is nonzero
 
-</details><details> <summary>\<b>TC-06 · Filter by title requires the text index\</b></summary>
+</details><details> <summary><b>TC-06 · Filter by title requires the text index</b></summary>
 
 - **Given** no text index on `title`
 - **When** `GET /api/v1/movies?title=Seven`
@@ -592,97 +608,97 @@ text
 - **When** the same request runs
 - **Then** results containing `Seven` are returned
 
-</details><details> <summary>\<b>TC-07 · Pagination\</b></summary>
+</details><details> <summary><b>TC-07 · Pagination</b></summary>
 
 - **Given** more than 20 movies
 - **When** `GET /api/v1/movies?page=1`
 - **Then** the returned set is **different** from `page=0` and contains 20 items
 
-</details><details> <summary>\<b>TC-08 · Post a review\</b></summary>
+</details><details> <summary><b>TC-08 · Post a review</b></summary>
 
 - **Given** a valid `movie_id` in ObjectId format
 - **When** a POST hits `/api/v1/movies/review` with `{ movie_id, review, user_id, name }`
 - **Then** `{ status: "success" }` is returned and the review appears in Atlas
 
-</details><details> <summary>\<b>TC-09 · Edit a review\</b></summary>
+</details><details> <summary><b>TC-09 · Edit a review</b></summary>
 
 - **Given** a review with `user_id = "1234"`
 - **When** a PUT is sent with the same `user_id` and a new `review`
 - **Then** `{ status: "success" }` is returned and Atlas reflects the change
 
-</details><details> <summary>\<b>TC-10 · Edit is rejected for the wrong owner\</b></summary>
+</details><details> <summary><b>TC-10 · Edit is rejected for the wrong owner</b></summary>
 
 - **Given** a review owned by `"1234"`
 - **When** a PUT is sent with `user_id = "9999"`
 - **Then** `modifiedCount` is `0` and the API returns `{ error: "unable to update review. User may not be original poster" }`
 
-</details><details> <summary>\<b>TC-11 · Delete a review\</b></summary>
+</details><details> <summary><b>TC-11 · Delete a review</b></summary>
 
 - **Given** a review owned by `"1234"`
 - **When** DELETE is sent with `{ review_id, user_id: "1234" }`
 - **Then** `{ status: "success" }` is returned and the review is gone from Atlas
 
-</details><details> <summary>\<b>TC-12 · Get one movie with reviews\</b></summary>
+</details><details> <summary><b>TC-12 · Get one movie with reviews</b></summary>
 
 - **Given** a movie has at least one review
 - **When** `GET /api/v1/movies/id/<movieId>`
 - **Then** the response includes a `reviews` array populated by `$lookup`
 
-</details><details> <summary>\<b>TC-13 · Get distinct ratings\</b></summary>
+</details><details> <summary><b>TC-13 · Get distinct ratings</b></summary>
 
 - **Given** the `movies` collection exists
 - **When** `GET /api/v1/movies/ratings`
 - **Then** the response is an array like `["AO", "APPROVED", "G", ...]`
 
-</details><details> <summary>\<b>TC-14 · React app renders 20 movie cards\</b></summary>
+</details><details> <summary><b>TC-14 · React app renders 20 movie cards</b></summary>
 
 - **Given** the backend is running on `5000`
 - **When** the React app loads `/movies`
 - **Then** 20 `<Card>` components render with titles, ratings, and "View Reviews" links
 
-</details><details> <summary>\<b>TC-15 · Login → Edit/Delete become visible\</b></summary>
+</details><details> <summary><b>TC-15 · Login → Edit/Delete become visible</b></summary>
 
 - **Given** a logged-in user whose `id` matches a review's `user_id`
 - **When** they visit that movie's page
 - **Then** the Edit and Delete controls appear next to their review
 
-</details><details> <summary>\<b>TC-16 · Logout hides owner controls\</b></summary>
+</details><details> <summary><b>TC-16 · Logout hides owner controls</b></summary>
 
 - **Given** the user clicks Logout
 - **When** they return to the same movie page
 - **Then** no Edit/Delete controls render
 
-</details><details> <summary>\<b>TC-17 · AddReview submits and returns\</b></summary>
+</details><details> <summary><b>TC-17 · AddReview submits and returns</b></summary>
 
 - **Given** a logged-in user on a movie page
 - **When** they add a review and submit
 - **Then** the UI shows "Review submitted successfully" with a "Back to Movie" link
 
-</details><details> <summary>\<b>TC-18 · Edit mode prefills the existing review\</b></summary>
+</details><details> <summary><b>TC-18 · Edit mode prefills the existing review</b></summary>
 
 - **Given** a click on "Edit" next to a review
 - **When** AddReview mounts
 - **Then** the header reads "Edit Review" and the field is prefilled with the review body
 
-</details><details> <summary>\<b>TC-19 · Get next page\</b></summary>
+</details><details> <summary><b>TC-19 · Get next page</b></summary>
 
 - **Given** the user is on page 0
 - **When** they click "Get next 20 results"
 - **Then** `currentPage` increments and the list refreshes with page 1 data
 
-</details><details> <summary>\<b>TC-20 · Search resets pagination\</b></summary>
+</details><details> <summary><b>TC-20 · Search resets pagination</b></summary>
 
 - **Given** the user is on page 3
 - **When** they type a title and press Search
 - **Then** `currentSearchMode` changes, `currentPage` resets to `0`, and results reflect page 0 of the new query
 
-</details><details> <summary>\<b>TC-21 · Heroku deploy succeeds\</b></summary>
+</details><details> <summary><b>TC-21 · Heroku deploy succeeds</b></summary>
 
 - **Given** `Procfile` and `engines.node` are set
 - **When** `git push heroku master` runs
 - **Then** the terminal shows `Verifying deploy... done` and the app URL works
 
-</details><details> <summary>\<b>TC-22 · Netlify deploy succeeds\</b></summary>
+</details><details> <summary><b>TC-22 · Netlify deploy succeeds</b></summary>
 
 - **Given** the React app builds cleanly
 - **When** the `build/` folder is dragged onto Netlify
@@ -694,7 +710,8 @@ text
 
 ## 15 · Success Metrics
 
-| **MetricTargetWhy It Matters** |                 |                                          |
+| **Metric** | **Target** | **Why It Matters** |
+| --- | --- | --- |
 | ------------------------------ | --------------- | ---------------------------------------- |
 | ⏱️ **First API response**      | `< 1 s`         | Node + Atlas, warm connection            |
 | 🌐 **Movies query round trip** | `< 400 ms` p95  | After Atlas caches the collection        |
@@ -741,6 +758,7 @@ npm install react-bootstrap bootstrap react-router-dom@5.2.0 axios moment
 npm start             # opens localhost:3000
 ```
 
+
 ### 16.2 · Project Structure
 
 text
@@ -778,9 +796,11 @@ movie-reviews/
     └── build/
 ```
 
+
 ### 16.3 · Backend Routes
 
-| **MethodURLWhat it does** |                          |                                       |
+| **Method** | **URL** | **What it does** |
+| --- | --- | --- |
 | ------------------------- | ------------------------ | ------------------------------------- |
 | GET                       | `/api/v1/movies`         | List movies (paginated, filterable)   |
 | GET                       | `/api/v1/movies?title=X` | Filter by title (requires text index) |
@@ -802,6 +822,7 @@ text
 GET  http://localhost:5000/api/v1/movies
 ```
 
+
 **Get G-rated movies, page 2**
 
 text
@@ -809,6 +830,7 @@ text
 ```
 GET  http://localhost:5000/api/v1/movies?rated=G&page=2
 ```
+
 
 **Post a review** (JSON body)
 
@@ -823,6 +845,7 @@ json
 }
 ```
 
+
 **Update a review** (JSON body)
 
 json
@@ -836,6 +859,7 @@ json
 }
 ```
 
+
 **Delete a review** (JSON body)
 
 json
@@ -847,9 +871,11 @@ json
 }
 ```
 
+
 ### 16.5 · Troubleshooting
 
-| **What you seeLikely reasonFix**                         |                                      |                                                   |
+| **What you see** | **Likely reason** | **Fix** |
+| --- | --- | --- |
 | -------------------------------------------------------- | ------------------------------------ | ------------------------------------------------- |
 | `server is running on port:5000` never prints            | `client.connect()` threw             | Check `.env` URI and Atlas IP whitelist           |
 | Empty `movies: []`                                       | No sample data loaded                | Ch. 4 — Load Sample Dataset                       |
@@ -863,7 +889,8 @@ json
 
 ### 16.6 · Glossary
 
-| **TermMeaning**          |                                                                        |
+| **Term** | **Meaning** |
+| --- | --- |
 | ------------------------ | ---------------------------------------------------------------------- |
 | **DAO**                  | Data Access Object — encapsulates all MongoDB operations.              |
 | **Controller**           | Express handler that parses requests and delegates to the DAO.         |
@@ -884,7 +911,8 @@ json
 
 ### 17.1 · Goals & Non-Goals
 
-| **GoalsNon-Goals**                         |                               |
+| **Goals** | **Non-Goals** |
+| --- | --- |
 | ------------------------------------------ | ----------------------------- |
 | Teach every layer of MERN with real code   | Full authentication system    |
 | Prioritise one vertical slice over breadth | Advanced MongoDB aggregations |
@@ -894,7 +922,7 @@ json
 
 ### 17.2 · Architecture Overview
 
-```
+```mermaid
 flowchart LR
     subgraph Client["Browser"]
         REACT["React SPA"]
@@ -924,7 +952,9 @@ flowchart LR
     REACT -.deployed as.-> NETLIFY
 ```
 
-| **LayerTechnologyResponsibility** |                              |                                           |
+
+| **Layer** | **Technology** | **Responsibility** |
+| --- | --- | --- |
 | --------------------------------- | ---------------------------- | ----------------------------------------- |
 | **Presentation**                  | React 17 + Bootstrap         | Renders the SPA, handles routing          |
 | **Data fetching**                 | axios via `MovieDataService` | Sends REST calls to the backend           |
@@ -936,7 +966,7 @@ flowchart LR
 
 ### 17.3 · Request Lifecycle
 
-```
+```mermaid
 flowchart TD
     A[Component calls MovieDataService] --> B[axios GET / POST / PUT / DELETE]
     B --> C[movies.route.js matches URL]
@@ -954,6 +984,7 @@ flowchart TD
     M --> N[Component setState]
 ```
 
+
 ### 17.4 · Environment Variables
 
 bash
@@ -965,13 +996,15 @@ MOVIEREVIEWS_NS=sample_mflix
 PORT=5000
 ```
 
+
 - Loaded by `dotenv.config()` inside `main()` in `index.js`.
 - **Never commit** `.env` — add it to `.gitignore`.
 - On Heroku, set them via the dashboard or `heroku config:set`.
 
 ### 17.5 · Key Design Decisions & Trade-offs
 
-| **#DecisionRationaleTrade-off** |                                       |                                            |                                               |
+| **#** | **Decision** | **Rationale** | **Trade-off** |
+| --- | --- | --- | --- |
 | ------------------------------- | ------------------------------------- | ------------------------------------------ | --------------------------------------------- |
 | **D1**                          | Native `mongodb` driver over Mongoose | Shows the raw driver API                   | No schema validation                          |
 | **D2**                          | DAO pattern                           | Separates MongoDB logic from Express logic | One more file per collection                  |
@@ -986,7 +1019,8 @@ PORT=5000
 
 ### 17.6 · Testing Strategy (suggested)
 
-| **LevelScopeTools (suggested)** |                                                                   |                                       |
+| **Level** | **Scope** | **Tools (suggested)** |
+| --- | --- | --- |
 | ------------------------------- | ----------------------------------------------------------------- | ------------------------------------- |
 | **Unit — DAO**                  | `getMovies`, `getMovieById`, `getRatings` with a mock driver      | Vitest / Jest                         |
 | **Unit — Controller**           | Query/body parsing; default values for `page` and `moviesPerPage` | Jest + `supertest`                    |
@@ -1008,7 +1042,8 @@ PORT=5000
 
 ## 18 · Chapter Index
 
-| **Ch.TitleLayerDeliverable** |                                     |     |                                       |
+| **Ch.** | **Title** | **Layer** | **Deliverable** |
+| --- | --- | --- | --- |
 | ---------------------------- | ----------------------------------- | --- | ------------------------------------- |
 | 1                            | Introduction                        | —   | MERN overview + app preview           |
 | 2                            | MongoDB Overview                    | DB  | Relational vs. NoSQL mental model     |
@@ -1043,7 +1078,8 @@ PORT=5000
 
 ### 19.1 · Known Issues in the Book's Approach
 
-| **IDIssueImpactMitigation** |                                                  |                                  |                                                 |
+| **ID** | **Issue** | **Impact** | **Mitigation** |
+| --- | --- | --- | --- |
 | --------------------------- | ------------------------------------------------ | -------------------------------- | ----------------------------------------------- |
 | **R1**                      | Fake login uses `{ name, id }` from a text field | Any user can claim any `user_id` | Add real authentication (Firebase Auth, Auth0). |
 | **R2**                      | `user_id` in the review body is trusted          | Ownership check can be spoofed   | Derive `user_id` from a session on the server.  |
@@ -1098,4 +1134,4 @@ PORT=5000
 
 <sub>⚡ MongoDB Atlas · Express 4 · React 17 · Node.js 14 · Heroku · Netlify</sub>
 
-</div>  \`\`\`
+</div>
