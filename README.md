@@ -2,8 +2,6 @@
 
 # 📚 Beginning MERN Stack
 
-### A class companion README for *Beginning MERN Stack* by Greg Lim
-
 *A chapter-by-chapter specification of the Movie Reviews app — from MongoDB Atlas provisioning through Express routes, React components, reviews CRUD, pagination, and cloud deployment on Heroku + Netlify.*
 
 <br />
